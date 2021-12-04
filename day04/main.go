@@ -179,11 +179,11 @@ func main() {
 	// set drawnCount to 5
 	drawnCount := 5
 
-	// set found winner to false
-	foundWinner := false
-
 	// store winningGrid
 	winningGrid := make([][]int, 0)
+
+	// winningDrawCount
+	winningDrawCount := 0
 
 	// print divider
 	fmt.Println("------------------------------------------------------")
@@ -191,16 +191,29 @@ func main() {
 	// currentDrawnNumbers is drawnNumbers slice from 0 until drawnCount
 	currentDrawnNumbers := drawnNumbers[:drawnCount]
 
-	// while foundWinner is false and drawnCount is less than len(drawnNumbers)
+	// track which grids have bingo
+	bingoGridsFound := make([]bool, 0)
+
+	// instantiate bingoGridsFound with number of bingo grids
+	for i := 0; i < len(bingoGrids); i++ {
+		bingoGridsFound = append(bingoGridsFound, false)
+	}
+
+	// while drawnCount is less than len(drawnNumbers)
 	// check each bingo grid for bingo using currentDrawnNumbers
-	// if bingo is found then set foundWinner to true and set winningGrid to bingo grid
+	// skip bingo grids that have already been found
+	// if bingo is found then set winningGrid to bingo grid and set winningDrawCount and keep going
 	// else increment drawnCount and set currentDrawnNumbers to drawnNumbers slice from 0 until drawnCount
-	for !foundWinner && drawnCount < len(drawnNumbers) {
-		for _, bingoGrid := range bingoGrids {
+	for drawnCount < len(drawnNumbers) {
+		for i, bingoGrid := range bingoGrids {
+			if bingoGridsFound[i] {
+				continue
+			}
+
 			if gridHasBingo(bingoGrid, currentDrawnNumbers) {
-				foundWinner = true
 				winningGrid = bingoGrid
-				break
+				winningDrawCount = drawnCount
+				bingoGridsFound[i] = true
 			}
 		}
 
@@ -208,20 +221,33 @@ func main() {
 		currentDrawnNumbers = drawnNumbers[:drawnCount]
 	}
 
-	// if found winner is true then decrement drawnCount and set currentDrawnNumbers to drawnNumbers slice from 0 until drawnCount
-	// and print winning grid and currentDrawnNumbers
-	// and print sum of unfound numbers in winning grid
-	if foundWinner {
-		drawnCount--
-		currentDrawnNumbers = drawnNumbers[:drawnCount]
-		fmt.Println(winningGrid)
-		fmt.Println(currentDrawnNumbers)
-		fmt.Println(sumUnfoundNumbers(winningGrid, currentDrawnNumbers))
-	} else {
-		fmt.Println("No winner")
+	// currentDrawnNumbers to drawnNumbers slice from 0 until winningDrawCount
+	currentDrawnNumbers = drawnNumbers[:winningDrawCount]
+
+	// Print currentDrawnNumbers
+	fmt.Println("Current Drawn Numbers:", currentDrawnNumbers)
+
+	// Print winningGrid
+	fmt.Println("Winning Grid:")
+	for _, row := range winningGrid {
+		fmt.Println(row)
 	}
 
-	// multiply sum of unfound numbers by last current drawn number
-	// print result
-	fmt.Println(sumUnfoundNumbers(winningGrid, currentDrawnNumbers) * currentDrawnNumbers[len(currentDrawnNumbers)-1])
+	// store sum of unfound numbers of winning grid
+	sum := sumUnfoundNumbers(winningGrid, currentDrawnNumbers)
+
+	// Get last drawn number from currentDrawnNumbers
+	lastDrawnNumber := currentDrawnNumbers[len(currentDrawnNumbers)-1]
+
+	// Print sum of unfound numbers of winning grid
+	fmt.Println("Sum of Unfound Numbers:", sum)
+
+	// Print last drawn number
+	fmt.Println("Last Drawn Number:", lastDrawnNumber)
+
+	// Multiply sum of unfound numbers by last drawn number
+	product := sum * lastDrawnNumber
+
+	// Print product
+	fmt.Println("Product:", product)
 }
