@@ -7,18 +7,6 @@ import (
 	"strings"
 )
 
-// WrapAroundDecrementSlice takes an int slice and decrements each element by one. If an element becomes negative, set its value to 6 and add an 8 to the slice and return the new slice
-func WrapAroundDecrementSlice(slice []int) []int {
-	for i := range slice {
-		slice[i]--
-		if slice[i] < 0 {
-			slice[i] = 6
-			slice = append(slice, 8)
-		}
-	}
-	return slice
-}
-
 // openFile opens a file and returns a slice of strings
 func openFile(filename string) ([]string, error) {
 	// Open the file
@@ -66,18 +54,63 @@ func main() {
 	// days is the first line of input as a slice of ints
 	days := SplitCommasToIntSlice(input[0])
 
-	// loop 80 times
-	// call WrapAroundDecrementSlice on days and re-assign days
-	// print every element of days on the same line
-	// print a divider
-	for i := 0; i < 80; i++ {
-		days = WrapAroundDecrementSlice(days)
-		for _, d := range days {
-			print(d)
-		}
-		println()
+	// Create int slice that can hold 9 elements
+	// This is the size of the memory block
+	memory := make([]int, 9)
+
+	// Count frequency of each value in days and store in memory
+	for _, d := range days {
+		memory[d]++
 	}
 
-	// print length of days
-	println(len(days))
+	// print each value in memory on the same line
+	for _, m := range memory {
+		print(m)
+		print(",")
+	}
+
+	// print new line
+	println()
+	// print divider
+	println("----------------------------------------")
+
+	// loop 256 times
+	// loop through values in memory
+	// store memory[0] in temp
+	// if j >= 1 set memory[j - 1] to memory[j]
+	// set memory[8] to 0
+	// if temp is greater than 0, add it to memory[6] and set memory[8] to temp
+	// print each value in memory on the same line
+	// print divider
+
+	for i := 0; i < 256; i++ {
+		temp := memory[0]
+		for j := 1; j < 9; j++ {
+			memory[j-1] = memory[j]
+		}
+		memory[8] = 0
+		if temp > 0 {
+			memory[6] += temp
+			memory[8] = temp
+		}
+		for _, m := range memory {
+			print(m)
+			print(",")
+		}
+		println()
+		println("----------------------------------------")
+	}
+
+	// sum is an unsigned int 64
+	sum := uint64(0)
+	// loop through values in memory
+	// if value is greater than 0, add it to sum
+	for _, m := range memory {
+		if m > 0 {
+			sum += uint64(m)
+		}
+	}
+
+	// print sum
+	println(sum)
 }
