@@ -24,53 +24,72 @@ func parseNumbers(line string) []int {
 	return intNumbers
 }
 
-// sort sorts a slice of ints
-func sort(numbers []int) {
-	// create a new slice of ints
-	var sortedNumbers = make([]int, len(numbers))
-	// copy numbers to sortedNumbers
-	copy(sortedNumbers, numbers)
-	// sort numbers
-	for i := len(sortedNumbers) - 1; i > 0; i-- {
-		for j := 0; j < i; j++ {
-			if sortedNumbers[j] > sortedNumbers[j+1] {
-				sortedNumbers[j], sortedNumbers[j+1] = sortedNumbers[j+1], sortedNumbers[j]
-			}
-		}
-	}
-	// copy sortedNumbers to numbers
-	copy(numbers, sortedNumbers)
-}
-
-// abs returns the absolute value of an int
-func abs(number int) int {
-	// if number is negative
-	if number < 0 {
-		// return number multiplied by -1
-		return number * -1
-	}
-	// return number
-	return number
-}
-
-// SumDisplacementOfNumbers takes an int slice and an int and returns the sum of the displacement of each number compared to the int
-func SumDisplacementOfNumbers(numbers []int, intNumber int) int {
-	// create a new slice of ints
-	var sortedNumbers = make([]int, len(numbers))
-	// copy numbers to sortedNumbers
-	copy(sortedNumbers, numbers)
-	// sort numbers
-	sort(sortedNumbers)
-
+// Sum returns the sum of a slice of ints
+func Sum(numbers []int) int {
 	// create a new int
 	var sum int
 	// loop over all numbers
 	for _, number := range numbers {
 		// add number to sum
-		sum += abs(number - intNumber)
+		sum += number
 	}
 	// return sum
 	return sum
+}
+
+// sumOfRange returns the sum of the range of numbers between start and end exclusive
+func sumOfRange(start, end int) int {
+	// create a new slice of ints
+	var sumOfRange []int
+	// loop over all numbers between start and end
+	for i := start; i <= end; i++ {
+		// append i to sumOfRange
+		sumOfRange = append(sumOfRange, i)
+	}
+	// return sum of sumOfRange
+	return Sum(sumOfRange)
+}
+
+// sumDisplacement takes int slice numbers and int target
+// if number is less than target, add sumOfRange(1, target-number) to sum
+// else add sumOfRange(1, number-target) to sum
+func SumDisplacement(numbers []int, target int) int {
+	// create a new int
+	var sum int
+	// loop over all numbers
+	for _, number := range numbers {
+		// if number is less than target
+		if number < target {
+			// add sumOfRange(1, target-number) to sum
+			sum += sumOfRange(1, target-number)
+		} else {
+			// add sumOfRange(1, number-target) to sum
+			sum += sumOfRange(1, number-target)
+		}
+	}
+	// return sum
+	return sum
+}
+
+// sort sorts a slice of ints in ascending order
+func sort(numbers []int) {
+	// create a new int
+	var min int
+	// loop over all numbers
+	for i := 0; i < len(numbers); i++ {
+		// set min to numbers[i]
+		min = numbers[i]
+		// loop over all numbers
+		for j := i + 1; j < len(numbers); j++ {
+			// if numbers[j] < min
+			if numbers[j] < min {
+				// set min to numbers[j]
+				min = numbers[j]
+				// swap numbers[i] and numbers[j]
+				numbers[i], numbers[j] = numbers[j], numbers[i]
+			}
+		}
+	}
 }
 
 func main() {
@@ -94,17 +113,39 @@ func main() {
 	var firstLine = lines[0]
 	var firstLineNumbers = parseNumbers(firstLine)
 
-	// range over firstLineNumbers and find the lowest sum of displacement
+	// sorted first line numbers
+	var sortedFirstLineNumbers = append([]int{}, firstLineNumbers...)
+	// sort first line numbers
+	sort(sortedFirstLineNumbers)
+
+	// max of first line numbers
+	var maxOfFirstLineNumbers = sortedFirstLineNumbers[len(sortedFirstLineNumbers)-1]
+
+	// lowestSumOfDisplacement starts at 0
 	var lowestSumOfDisplacement int
 
-	// loop over all numbers
-	for _, number := range firstLineNumbers {
-		// find sum of displacement of firstLineNumbers and number
-		var sumOfDisplacement = SumDisplacementOfNumbers(firstLineNumbers, number)
-		// if sumOfDisplacement is lower than lowestSumOfDisplacement
-		if sumOfDisplacement < lowestSumOfDisplacement || lowestSumOfDisplacement == 0 {
-			// set lowestSumOfDisplacement to sumOfDisplacement
-			lowestSumOfDisplacement = sumOfDisplacement
+	// loop over 0 to max of first line numbers
+	// if number == 5
+	//	print number
+	//  print sumDisplacement
+	// 	print divider
+	// if sumDisplacement < lowestSumOfDisplacement o lowestSumOfDisplacement == 0
+	//	lowestSumOfDisplacement = sumDisplacement
+
+	for i := 0; i <= maxOfFirstLineNumbers; i++ {
+		// if i == 5
+		//	print i
+		//  print sumDisplacement
+		// 	print divider
+		// if sumDisplacement < lowestSumOfDisplacement o lowestSumOfDisplacement == 0
+		//	lowestSumOfDisplacement = sumDisplacement
+		if i == 5 {
+			println(i)
+			println(SumDisplacement(firstLineNumbers, i))
+			println("---")
+		}
+		if SumDisplacement(firstLineNumbers, i) < lowestSumOfDisplacement || lowestSumOfDisplacement == 0 {
+			lowestSumOfDisplacement = SumDisplacement(firstLineNumbers, i)
 		}
 	}
 
